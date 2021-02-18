@@ -1,169 +1,119 @@
 import 'package:flutter/material.dart';
-import 'dart:ui';
+import 'package:english_words/english_words.dart';
 
-void main() {
-  runApp(MyApp());
-}
+void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      home: Page1(),
+      title: 'Startup Name Generator',
+      theme: ThemeData(
+        primaryColor: Colors.white,
+      ),
+      home: RandomWords(),
     );
   }
 }
 
 
-
-class Page1 extends StatefulWidget {
+class RandomWords extends StatefulWidget {
   @override
-  _Page1State createState() => _Page1State();
+  _RandomWordsState createState() => _RandomWordsState();
 }
 
-class _Page1State extends State<Page1> with TickerProviderStateMixin{
-  // Animation<double> animation;
-  // AnimationController animationController;
-  List<int> temp = [0, 0, 0, 0, 0, 0, 0, 0];
+class _RandomWordsState extends State<RandomWords> {
+  final List<WordPair> _suggestions = <WordPair>[];
+  final _saved = Set<WordPair>();
+  final TextStyle _biggerFont = const TextStyle(fontSize: 18);
 
-  AlignmentDirectional _ggochiAlignment = AlignmentDirectional(0.0, -0.4);
-  AlignmentDirectional _bbangAlignment = AlignmentDirectional(0.0, -0.2);
-  AlignmentDirectional _sangchuAlignment = AlignmentDirectional(0.0, -0.1);
-  AlignmentDirectional _cheeseAlignment = AlignmentDirectional(0.0, -0.05);
-  AlignmentDirectional _tomatoAlignment = AlignmentDirectional(0.0, 0.0);
-  AlignmentDirectional _yangpaAlignment = AlignmentDirectional(0.0, 0.05);
-  AlignmentDirectional _gogiAlignment = AlignmentDirectional(0.0, 0.1);
-  AlignmentDirectional _bbang2Alignment = AlignmentDirectional(0.0, 0.15);
-  
-  void _setGgochi(int a){
-    setState(() {
-      if (temp[a] == 0) {
-        _ggochiAlignment = AlignmentDirectional(0.0, -0.7);
-        temp[a] = 1;
-      }
-      else {
-        _ggochiAlignment = AlignmentDirectional(0.0, -0.4);
-        temp[a] = 0;
-      }
-    });
+  void _pushSaved() {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        // NEW lines from here...
+        builder: (BuildContext context) {
+          final tiles = _saved.map(
+                (WordPair pair) {
+              return ListTile(
+                title: Text(
+                  pair.asPascalCase,
+                  style: _biggerFont,
+                ),
+              );
+            },
+          );
+          final divided = ListTile.divideTiles(
+            context: context,
+            tiles: tiles,
+          ).toList();
+
+          return Scaffold(
+            appBar: AppBar(
+              title: Text('Saved Suggestions'),
+            ),
+            body: ListView(children: divided),
+          );
+        }, // ...to here.
+      ),
+    );
   }
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('hamburger'),
+        title: Text('Startup Name Generator'),
+        actions: [
+          IconButton(icon: Icon(Icons.list), onPressed: _pushSaved),
+        ],
       ),
-      body: Stack(
-        children: <Widget>[
-            Align(
-              child: GestureDetector(
-                child: AnimatedContainer(
-                  duration: Duration(seconds: 1),
-                  alignment: _ggochiAlignment,
-                  child: Container(
-                    child: Image.asset('image/ggochi.png', height: 70,),
-                    ),
-                  ),
-                onTap: (){ _setGgochi(temp[0]); print("꼬치"); print(temp[0]);},
-                ),
-              ),
-            Align(
-              //alignment: AlignmentDirectional(0, 0.7),
-              child: AnimatedContainer(
-                  duration: Duration(seconds: 1),
-                  alignment: _bbangAlignment,
-                  child: GestureDetector(
-                    child: Image.asset('image/bbang.png', width: 150),
-                    onTap: (){
-                      print("빵");
-                    },
-                  )
-              ),
-            ),
-            Align(
-              //alignment: AlignmentDirectional(0, 0.7),
-              child: AnimatedContainer(
-                  duration: Duration(seconds: 1),
-                  alignment: _sangchuAlignment,
-                  child: GestureDetector(
-                    child: Image.asset('image/sangchu.png', width: 150),
-                    onTap: (){
-                      print("상추");
-                    },
-                  )
-              ),
-            ),
-            Align(
-              //alignment: AlignmentDirectional(0, 0.7),
-              child: AnimatedContainer(
-                  duration: Duration(seconds: 1),
-                  alignment: _cheeseAlignment,
-                  child: GestureDetector(
-                    child: Image.asset('image/cheese.png', width: 150),
-                    onTap: (){
-                      print("치즈");
-                    },
-                  )
-              ),
-            ),
-            Align(
-              //alignment: AlignmentDirectional(0, 0.7),
-              child: AnimatedContainer(
-                  duration: Duration(seconds: 1),
-                  alignment: _tomatoAlignment,
-                  child: GestureDetector(
-                    child: Image.asset('image/tomato.png', width: 150),
-                    onTap: (){
-                      print("토마토");
-                    },
-                  )
-              ),
-            ),
-            Align(
-              //alignment: AlignmentDirectional(0, 0.7),
-              child: AnimatedContainer(
-                  duration: Duration(seconds: 1),
-                  alignment: _yangpaAlignment,
-                  child: GestureDetector(
-                    child: Image.asset('image/yangpa.png', width: 150),
-                    onTap: (){
-                      print("양파");
-                    },
-                  )
-              ),
-            ),
-            Align(
-              //alignment: AlignmentDirectional(0, 0.7),
-              child: AnimatedContainer(
-                  duration: Duration(seconds: 1),
-                  alignment: _gogiAlignment,
-                  child: GestureDetector(
-                    child: Image.asset('image/gogi.png', width: 150),
-                    onTap: (){
-                      print("고기");
-                    },
-                  )
-              ),
-            ),
-            Align(
-              //alignment: AlignmentDirectional(0, 0.7),
-              child: AnimatedContainer(
-                  duration: Duration(seconds: 1),
-                  alignment: _bbang2Alignment,
-                  child: GestureDetector(
-                    child: Image.asset('image/bbang2.png', width: 150),
-                    onTap: (){
-                      print("빵2");
-                    },
-                  )
-              ),
-            ),
-          ],
-        )
+      body: _buildSuggestions(),
     );
   }
 
+  Widget _buildRow(WordPair pair) {
+    final alreadySaved = _saved.contains(pair);
+
+    return ListTile(
+      title: Text(
+        pair.asPascalCase,
+        style: _biggerFont,
+      ),
+      trailing: Icon(
+        alreadySaved ? Icons.favorite : Icons.favorite_border,
+        color: alreadySaved ? Colors.red : null,
+      ),
+      onTap: () {
+        setState(() {
+          if (alreadySaved) {
+            _saved.remove(pair);
+          } else {
+            _saved.add(pair);
+          }
+        });
+      },
+    );
+  }
+
+  Widget _buildSuggestions() {
+    return ListView.builder(
+        padding: const EdgeInsets.all(16),
+        itemBuilder: (BuildContext _context, int i) {
+          // Add a one-pixel-high divider widget before each row
+          // in the ListView.
+          if (i.isOdd) {
+            return Divider();
+          }
+
+          final int index = i ~/ 2;
+          if (index >= _suggestions.length) {
+            // ...then generate 10 more and add them to the
+            // suggestions list.
+            _suggestions.addAll(generateWordPairs().take(10));
+          }
+          return _buildRow(_suggestions[index]);
+        }
+    );
+  }
 }
