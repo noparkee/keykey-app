@@ -6,13 +6,19 @@ void main() {
   runApp(MyApp());
 }
 
+final routes = {
+  '/': (BuildContext context) => Page1(),
+  '/first': (BuildContext context) => Page1(),
+  '/second': (BuildContext context) => Page2(),
+};
+
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      home: Page1(),
+      //home: Page1(),
+      routes: routes,
     );
   }
 }
@@ -24,6 +30,24 @@ class Page1 extends StatefulWidget {
   _Page1State createState() => _Page1State();
 }
 
+class Page2 extends StatefulWidget {
+  @override
+  _Page2State createState() => _Page2State();
+}
+
+class _Page2State extends State<Page2> with TickerProviderStateMixin{
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: AppBar(
+        title: Text('chick'),
+      ),
+    );
+  }
+
+}
+
+
 class _Page1State extends State<Page1> with TickerProviderStateMixin{
   // 0이면 움직일 수 있어
   List<int> flag = [0, 0, 0, 0, 0, 0, 0, 0];    // 꼬치, 빵, 상추, 치즈, 토마토, 양파, 고기, 빵2
@@ -33,10 +57,19 @@ class _Page1State extends State<Page1> with TickerProviderStateMixin{
   List<AlignmentDirectional> ad = [AlignmentDirectional(0.0, -0.2), AlignmentDirectional(0.0, 0.0), AlignmentDirectional(0.0, 0.1),
                                   AlignmentDirectional(0.0, 0.15), AlignmentDirectional(0.0, 0.2),
                                   AlignmentDirectional(0.0, 0.25), AlignmentDirectional(0.0, 0.3), AlignmentDirectional(0.0, 0.35)];
-  AlignmentDirectional _hidden = AlignmentDirectional(0.0, 0.175);
-  AlignmentDirectional _key = AlignmentDirectional(0.0, 0.175);
+  AlignmentDirectional _hidden = AlignmentDirectional(0.0, 0.165);
+  AlignmentDirectional _key = AlignmentDirectional(0.0, 0.165);
 
-  List<double> position = [-0.2, 0.0, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35];
+  List<double> position = [-0.2, 0.0, 0.1, 0.15,           0.2, 0.25, 0.3, 0.35, 0.165, 0.165];     // ~~~~~, hidden, key
+  //List<double> position = [-0.6, -0.3, -0.1, 0.0, 0.12, 0.22, 0.32, 0.42, 0.06, 0.06];     // ~~~~~, hidden, key
+
+  int _checkFlagHK(){
+    if (hidden == 0)
+      return 0;
+    if (hidden == 1){
+      return 1;
+    }
+  }
 
   bool _checkFlag(int a){
     if (flag[a] == 0){  // a번째를 움직이고 싶을 때
@@ -54,29 +87,30 @@ class _Page1State extends State<Page1> with TickerProviderStateMixin{
     return true;
   }
 
+  void _stopMove(){
+    key = 1;
+  }
+
   void _setMove(int a){
     setState(() {
-      if (hidden == 0) {
+      if (key == 0) {
         if (flag[a] == 0) { // up 움직이기 전
           ad[a] = AlignmentDirectional(0.0, position[a] - 0.3);
           flag[a] = 1;
-
-          if (a == 3 || a == 4) {
-            _hidden = AlignmentDirectional(0.0, 0.175 - 0.3);
-            _key = AlignmentDirectional(0.0, 0.175 - 0.3);
-            //hidden = 0;   // 키 한 번 찾으면 버거 다시 못 돌리게 하려면 지워야함
+          if (a == 3 || a == 4) { // flag[a] = 0
+            _hidden = AlignmentDirectional(0.0, position[8] - 0.3);
+            _key = AlignmentDirectional(0.0, position[9] - 0.3);
           }
         }
         else { // down 원위치로 가고 싶을 때
           ad[a] = AlignmentDirectional(0.0, position[a]);
           flag[a] = 0;
-
-          if (a == 3 || a == 4) {
-            _hidden = AlignmentDirectional(0.0, 0.175);
-            _key = AlignmentDirectional(0.0, 0.175);
-            //hidden = 0;   // 키 한 번 찾으면 버거 다시 못 돌리게 하려면 지워야함
+          if (a == 3 || a == 4) { // flag[a] = 1
+            _hidden = AlignmentDirectional(0.0, position[8]);
+            _key = AlignmentDirectional(0.0, position[9]);
           }
         }
+        hidden = 0;
       }
     });
   }
@@ -89,12 +123,16 @@ class _Page1State extends State<Page1> with TickerProviderStateMixin{
       }
       if (hidden == 0 && flag[3] == 0 && flag[4] == 0){
         ad[3] = AlignmentDirectional(0.0, position[3]-0.3);
-        _key = AlignmentDirectional(0.0, 0.025);
+        _key = AlignmentDirectional(0.0, (position[3]+position[4]-0.3)/2);
+        _hidden = AlignmentDirectional(0.0, (position[3]+position[4]-0.3)/2);
       }
-      if (hidden == 0 && flag[3] == 1 && flag[4] == 1){
+      else if (hidden == 0 && flag[3] == 1 && flag[4] == 1){
         ad[4] = AlignmentDirectional(0.0, position[4]);
-        _key = AlignmentDirectional(0.0, 0.025);
+        _key = AlignmentDirectional(0.0, (position[3]+position[4]-0.3)/2);
+        _hidden = AlignmentDirectional(0.0, (position[3]+position[4]-0.3)/2);
       }
+      flag[3] = 1;
+      flag[4] = 0;
       hidden = 1;
     });
   }
@@ -118,7 +156,11 @@ class _Page1State extends State<Page1> with TickerProviderStateMixin{
                    child: Image.asset('image/key.png', height: 20,)
                  ) ,
                 ),
-                onTap: (){}
+                onTap: (){
+                  _stopMove();
+                  print("키");
+                  Navigator.pushNamed(context, '/second');
+                }
               ),
             ),
             Align(
@@ -174,31 +216,18 @@ class _Page1State extends State<Page1> with TickerProviderStateMixin{
                   child: GestureDetector(
                     child: Image.asset('image/cheese.png', height: 20),
                     onTap: (){
-                      if (_checkFlag(3) || _checkFlag(4)) {
+                      if (_checkFlagHK() == 0 && (_checkFlag(3) || _checkFlag(4))){
                         _setMove(3);
                         _setMove(4);
                       }
-                      print(flag[3]);
-                      print(flag[4]);
+                      else if (_checkFlagHK() == 1 && _checkFlag(3)){
+                        _setMove(3);
+                      }
                       print("치즈");
                     },
                   )
               ),
             ),
-          Align(
-            //alignment: AlignmentDirectional(0, 0.7),
-            child: AnimatedContainer(
-                duration: Duration(seconds: 1),
-                alignment: _hidden,
-                child: GestureDetector(
-                  child: Image.asset('image/hamjung.png', height: 20),
-                  onTap: (){
-                    _setHidden();
-                    print("hidden");
-                  },
-                )
-            ),
-          ),
             Align(
               //alignment: AlignmentDirectional(0, 0.7),
               child: AnimatedContainer(
@@ -207,8 +236,11 @@ class _Page1State extends State<Page1> with TickerProviderStateMixin{
                   child: GestureDetector(
                     child: Image.asset('image/tomato.png', height: 20),
                     onTap: (){
-                      if (_checkFlag(3) || _checkFlag(4)) {
+                      if (_checkFlagHK() == 0 && (_checkFlag(3) || _checkFlag(4))){
                         _setMove(3);
+                        _setMove(4);
+                      }
+                      else if (_checkFlagHK() == 1 && _checkFlag(4)){
                         _setMove(4);
                       }
 
@@ -258,6 +290,20 @@ class _Page1State extends State<Page1> with TickerProviderStateMixin{
                       if (_checkFlag(7))
                         _setMove(7);
                       print("빵2");
+                    },
+                  )
+              ),
+            ),
+            Align(
+              //alignment: AlignmentDirectional(0, 0.7),
+              child: AnimatedContainer(
+                  duration: Duration(seconds: 1),
+                  alignment: _hidden,
+                  child: GestureDetector(
+                    child: Image.asset('image/hamjung.png', height: 5),
+                    onTap: (){
+                      _setHidden();
+                      print("hidden");
                     },
                   )
               ),
